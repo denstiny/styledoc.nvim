@@ -22,4 +22,10 @@ function M.autocmd(group, event, opts)
 	opts["group"] = group
 	vim.api.nvim_create_autocmd(event, opts)
 end
+
+function M.buf_is_editable(bufnr)
+	local bufoptions = vim.api.nvim_buf_get_option(bufnr, "readonly")
+	return bufoptions
+end
+
 return M
