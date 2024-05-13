@@ -1,0 +1,4 @@
+# 设定列宽度限制
+column_width = 80
+# 设定缩进宽度
+indent_width = 2

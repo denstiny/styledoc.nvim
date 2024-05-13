@@ -4,6 +4,7 @@ local event = require("styledoc.event")
 local info = require("styledoc.info")
 local utils = require("styledoc.utils")
 local ts = vim.treesitter
+local core = require("styledoc.core")
 
 ---@param config table
 function init(config)
@@ -11,22 +12,38 @@ function init(config)
 		group = info.group,
 		pattern = { "*.md" },
 		callback = function(arg)
+			local bufnr = arg.buf
+			-- 注册，当markdown的bufnr所在的窗口发生改变，发送刷新信号
+			vim.api.nvim_create_autocmd("WinResized", {
+				callback = function(_arg)
+					if _arg.buf == bufnr then
+						event:emit_signal("StyleRefreshPre")
+					end
+				end,
+			})
+
+			-- 监听treesitter node 的变化
 			event:emit_signal("StyleRefreshPre", arg)
-			local parser = ts.get_parser(arg.buf)
+			local parser = ts.get_parser(bufnr)
 			parser:register_cbs({
 				on_changedtree = function(changes, languagetree)
-					event:emit_signal("StyleTreeChanged", arg.buf)
+					--event:emit_signal("StyleTreeChanged", arg.buf, changes)
+					vim.defer_fn(function()
+						core.assignTasksBasedOnNodeChange(bufnr, changes)
+					end, 0)
 				end,
 			}, false)
 		end,
 	})
+
+	-- 在初始化阶段，发送刷新指令
 	local ui = config["ui"]
 	for key, value in pairs(ui) do
 		if value.enable then
 			local modul = require("styledoc.core." .. key)
-			modul.inti_signal()
+			modul.init_signal()
 			event:bind_signal("StyleRefreshPre", function(arg)
-				modul.draw(arg)
+				modul.init(arg.buf)
 			end)
 		end
 	end

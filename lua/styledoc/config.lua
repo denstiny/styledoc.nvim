@@ -38,12 +38,20 @@ local default_config = {
 		},
 		title = {
 			enable = false,
-			symbol = { "○", " ○ ", "  ○ ", "   ○ ", "    ○ ", "     ○ ", "      ○ " },
+			symbol = {
+				"○",
+				" ○ ",
+				"  ○ ",
+				"   ○ ",
+				"    ○ ",
+				"     ○ ",
+				"      ○ ",
+			},
 		},
 	},
 }
 
-M.hilinkghlights = {
+M.highlights = {
 	h1 = "style_h1",
 	h2 = "style_h2",
 	h3 = "style_h3",
@@ -74,21 +82,21 @@ end
 --- 初始化高亮组
 function M:init_color()
 	-- Titile
-	utils.hilink(self.hilinkghlights.h1, "markdownH1")
-	utils.hilink(self.hilinkghlights.h2, "markdownH2")
-	utils.hilink(self.hilinkghlights.h3, "markdownH3")
-	utils.hilink(self.hilinkghlights.h4, "markdownH4")
-	utils.hilink(self.hilinkghlights.h5, "markdownH5")
-	utils.hilink(self.hilinkghlights.h6, "markdownH6")
+	utils.hilink(self.highlights.h1, "markdownH1")
+	utils.hilink(self.highlights.h2, "markdownH2")
+	utils.hilink(self.highlights.h3, "markdownH3")
+	utils.hilink(self.highlights.h4, "markdownH4")
+	utils.hilink(self.highlights.h5, "markdownH5")
+	utils.hilink(self.highlights.h6, "markdownH6")
 	-- toodlist
-	utils.hi(self.hilinkghlights.todolist_done, "#d4fad4")
-	utils.hi(self.hilinkghlights.todolist_udone, "#1a1918")
+	utils.hi(self.highlights.todolist_done, "#d4fad4", "none")
+	utils.hi(self.highlights.todolist_udone, "#1a1918", "none")
 	-- list
-	utils.hilink(self.hilinkghlights.list, "markdownListMarker")
+	utils.hilink(self.highlights.list, "markdownListMarker")
 	-- partingline
-	utils.hilink(self.hilinkghlights.partingline, "Comment")
+	utils.hilink(self.highlights.partingline, "Comment")
 	-- codeblocks
-	utils.hilink(self.hilinkghlights.codeblock, "markdownBlockquote")
+	utils.hilink(self.highlights.codeblock, "CursorLine")
 end
 
 return M
