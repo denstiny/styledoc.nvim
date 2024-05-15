@@ -1,7 +1,9 @@
 local M = {}
+local ts_utils = vim.treesitter
 local info = require("styledoc.info")
 local api = vim.api
 local fn = vim.fn
+local ns_id = vim.api.nvim_create_namespace("code-block")
 
 --- 设置全局高亮组
 ---@param group string
@@ -32,34 +34,53 @@ function M.buf_is_editable(bufnr)
 	return bufoptions
 end
 
-function M.hi_line(bufnr, line, hl, ns_id)
-	--M.del_hl(bufnr, line, line + 1)
-	local marks = M.get_extmark(bufnr, ns_id, line, line + 1)
-	local text = string.rep(" ", fn.winwidth(fn.bufwinnr(bufnr)))
+--- 高亮指定行
+---@param bufnr integer
+---@param line integer
+---@param hl string|integer
+function M.hi_line(bufnr, line, hl)
+	local marks = M.get_extmark(bufnr, line, line + 1)
+	local fn_len = vim.fn.strdisplaywidth(fn.getline(line + 1))
+	local text = string.rep(" ", fn.winwidth(fn.bufwinnr(bufnr)) - fn_len)
 	local opts = {
 		virt_text = { { text, hl } },
 		hl_eol = true,
 		virt_text_pos = "overlay",
 	}
-	api.nvim_buf_add_highlight(bufnr, ns_id, hl, line, 0, -1)
-	local _, text = pcall(
+	local extmark_id = api.nvim_buf_add_highlight(bufnr, ns_id, hl, line, 0, -1)
+	local _, res = pcall(
 		api.nvim_buf_set_extmark,
 		bufnr,
 		ns_id,
 		line,
-		fn.len(fn.getline(line + 1)),
+		--fn.len(fn.getline(line + 1)),
+		fn_len,
 		opts
 	)
 	if not _ then
-		print(text)
+		print(res)
+		return nil, nil
 	else
 		marks:for_each(function(id)
 			vim.api.nvim_buf_del_extmark(bufnr, ns_id, id)
 		end)
+		return extmark_id, res
 	end
 end
 
-function M.get_extmark(bufnr, ns_id, start, end_)
+--- 获取指定namespace的所有标记
+---@param bufnr
+---@return
+function M.get_extmark_all(bufnr)
+	return M.get_extmark(bufnr, 0, -1)
+end
+
+--- 获取指定范围的extmark
+---@param bufnr integer
+---@param start integer
+---@param end_ integer
+---@return
+function M.get_extmark(bufnr, start, end_)
 	local items = vim.api.nvim_buf_get_extmarks(
 		bufnr,
 		ns_id,
@@ -76,15 +97,28 @@ function M.get_extmark(bufnr, ns_id, start, end_)
 	return marks
 end
 
+--- 包装的一个list，涵盖foreach 回调
+---@return
 function M.list()
 	local list = {
 		_list = {},
 		add = function(self, opt)
 			table.insert(self._list, opt)
 		end,
+		add_for_key = function(self, key, opt)
+			if not self._list[key] then
+				self._list[key] = {}
+			end
+			table.insert(self._list[key], opt)
+		end,
 		for_each = function(self, callback)
 			for key, value in pairs(self._list) do
-				callback(value)
+				callback(value, key)
+			end
+		end,
+		for_each_form_key = function(self, key, callback)
+			for k, value in pairs(self._list[key]) do
+				callback(k, value)
 			end
 		end,
 	}
@@ -95,7 +129,7 @@ end
 ---@param bufnr
 ---@param start
 ---@param end_
-function M.del_hl(bufnr, ns_id, start, end_)
+function M.del_hl(bufnr, start, end_)
 	local items = vim.api.nvim_buf_get_extmarks(
 		bufnr,
 		ns_id,
@@ -104,7 +138,6 @@ function M.del_hl(bufnr, ns_id, start, end_)
 		{}
 	)
 	for _, mark in ipairs(items) do
-		--vim.notify(vim.inspect(mark))
 		local id = mark[1]
 		vim.api.nvim_buf_del_extmark(bufnr, ns_id, id)
 	end
@@ -112,5 +145,45 @@ end
 
 function M.buf_form_window(bufnr)
 	--vim.api.nvim_
+end
+
+--- 在指定行设置虚拟文本
+---@param bufnr integer
+---@param hl integer|string
+---@param pos table
+---@param text string
+function M.set_extmark(bufnr, hl, pos, text)
+	if text == "" or text == nil then
+		return nil
+	end
+	local opts = {
+		virt_text = { { text, hl } },
+		virt_text_pos = "overlay",
+	}
+	local _, message =
+		pcall(api.nvim_buf_set_extmark, bufnr, ns_id, pos.line, pos.col, opts)
+	if not _ then
+		M.error(message .. vim.inspect(pos))
+		return nil
+	else
+		return message
+	end
+end
+
+function M.error(text)
+	vim.notify(text, vim.log.levels.ERROR, {
+		title = "Styledoc",
+	})
+end
+
+function M.is_line_covered_by_node(bufnr, target_line, node)
+	-- 遍历整个树查找是否有节点覆盖这一行
+	for n in node:iter_children() do
+		if ts_utils.is_in_node_range(n, target_line, 0) then
+			return true, n
+		end
+	end
+
+	return false
 end
 return M

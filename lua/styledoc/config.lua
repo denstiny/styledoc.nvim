@@ -99,4 +99,17 @@ function M:init_color()
 	utils.hilink(self.highlights.codeblock, "CursorLine")
 end
 
+--- 获取符号，如果是函数则执行函数返回符号
+---@param symbol string|function
+---@return string
+function M.symbol(symbol, ...)
+	local symbol_type = type(symbol)
+	if symbol_type == "string" then
+		return symbol
+	elseif symbol_type == "function" then
+		return symbol(...)
+	else
+		return ""
+	end
+end
 return M

@@ -17,7 +17,7 @@ function init(config)
 			vim.api.nvim_create_autocmd("WinResized", {
 				callback = function(_arg)
 					if _arg.buf == bufnr then
-						event:emit_signal("StyleRefreshPre")
+						--event:emit_signal("StyleRefreshPre")
 					end
 				end,
 			})
@@ -35,6 +35,15 @@ function init(config)
 			}, false)
 		end,
 	})
+	--local timer = vim.uv.new_timer()
+	--timer:start(
+	--	0,
+	--	100,
+	--	vim.schedule_wrap(function()
+	--		event:emit_signal("StyleRefreshPre", arg)
+	--		--vim.notify("刷新")
+	--	end)
+	--)
 
 	-- 在初始化阶段，发送刷新指令
 	local ui = config["ui"]

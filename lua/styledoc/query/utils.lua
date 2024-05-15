@@ -1,3 +1,4 @@
+local ts_utils = vim.treesitter
 local M = {}
 
 --- query bufnr treesitter parse node
@@ -30,6 +31,7 @@ function M.get_nodes_table(bufnr, start_line, end_line, parse_query_text)
 		for id, captures, _ in query_iter do
 			local n_root = captures[id]
 			--vim.notify(query.captures[id])
+			--vim.notify(id .. "")
 			table.insert(nodes.list, { [query.captures[id]] = n_root })
 		end
 	end)
