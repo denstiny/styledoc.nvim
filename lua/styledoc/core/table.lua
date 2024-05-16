@@ -16,6 +16,10 @@ function M.draw(bufnr, captures)
 	end
 end
 
+--- 渲染表格符号，在渲染之前线删除之前的表格符号
+---@param bufnr
+---@param start
+---@param end_
 function M.style_table(bufnr, start, end_)
 	-- 渲染分隔线
 	local user_conf = config:config()
@@ -23,6 +27,7 @@ function M.style_table(bufnr, start, end_)
 
 	t.del_hl(bufnr, start, end_)
 	for i = start, end_ do
+		--- 由于treesitter无法支持符号的索引，所以索性自己去解析table的分隔符号的位置
 		local separator_index = t.find_char_index_form_bufline(bufnr, i, "|")
 		--t.del_hl(bufnr, i, i)
 		for _, n_i in pairs(separator_index or {}) do
@@ -81,6 +86,7 @@ function M.table_header(bufnr, captures)
 	end
 end
 
+-- 遍历本次修改的 coluem
 function M.table_cell(bufnr, captures)
 	for capture, node in pairs(captures) do
 		local text, len = t.trim(ts.get_node_text(node, bufnr))
@@ -91,6 +97,7 @@ function M.table_cell(bufnr, captures)
 	end
 end
 
+-- 遍历本次修改的分隔符
 function M.table_delimiter_cell(bufnr, captures)
 	for capture, node in pairs(captures) do
 		local text, len = t.trim(ts.get_node_text(node, bufnr))
@@ -106,6 +113,7 @@ end
 function M.format_table(bufnr)
 	local maxlen = M.table.maxlen
 	local heading_one_space_index = 0
+	--[ 由于通过bufer_set_text无法避免删除渲染的符号，所以提前保存需要格式化的范围，冲洗渲染符号 ]
 	local start_line = 0
 	local end_line = 0
 
@@ -135,6 +143,7 @@ function M.format_table(bufnr)
 	for index, n in ipairs(M.table.cell) do
 		local s_row = n.node:start()
 		local separator_index = t.find_char_index_form_bufline(bufnr, s_row, "|")
+		assert(separator_index)
 		local align = M.table.align[index]
 		local heading_space_index = 0
 		local align_space = ""
@@ -167,6 +176,7 @@ function M.format_table(bufnr)
 			end_line = s_row
 		end
 		local separator_index = t.find_char_index_form_bufline(bufnr, s_row, "|")
+		assert(separator_index)
 		i = index % #M.table.align
 		if i == 0 then
 			i = #M.table.align
@@ -200,6 +210,11 @@ function M.format_table(bufnr)
 	M.style_table(bufnr, start_line, end_line)
 end
 
+---@param str string
+---@param left boolean
+---@param right boolean
+---@param maxlen integer
+---@return string
 function M.format_table_row(str, left, right, maxlen)
 	local text
 	local len = string.len(str)
