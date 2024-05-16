@@ -10,12 +10,7 @@ local M = {
 	--	(inline) @inline
 	--]],
 
-	inline = [[
-(section 
- (paragraph 
-  (inline)@scavenger_inline
-))
-  ]],
+	inline = [[ (section (paragraph (inline)@scavenger_inline)) ]],
 
 	section = [[(section) @section ]],
 

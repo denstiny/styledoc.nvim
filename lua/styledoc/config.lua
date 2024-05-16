@@ -51,8 +51,9 @@ local default_config = {
 		table = {
 			enable = true,
 			symbol = {
-				left = "󰘟",
-				right = "󰘠",
+				leftalign = "󰘟",
+				rightalign = "󰘠",
+				line = "│",
 			},
 		},
 	},

@@ -6,25 +6,44 @@ local t = require("styledoc.utils")
 local qtable = require("styledoc.query.table")
 local qinfo = require("styledoc.query.info")
 local qutils = require("styledoc.query.utils")
+local config = require("styledoc.config")
 
 function M.draw(bufnr, captures)
 	M.table = { heading = {}, cell = {}, row = {}, maxlen = 0, align = {} }
 	for capture, node in pairs(captures) do
 		local start, end_ = node:start(), node:end_()
-
-		for i = start, end_ do
-			M.style_table(bufnr, i)
-		end
+		M.style_table(bufnr, start, end_)
 	end
 end
 
-function M.style_table(bufnr, i)
-	local separator_index = t.find_char_index_form_bufline(bufnr, i, "|")
-	t.del_hl(bufnr, i, i)
-	for _, n_i in pairs(separator_index or {}) do
-		local pos = { line = i, col = n_i }
-		t.set_extmark(bufnr, "Normal", pos, " │")
+function M.style_table(bufnr, start, end_)
+	-- 渲染分隔线
+	local user_conf = config:config()
+	local symbols = user_conf.ui.table.symbol
+
+	t.del_hl(bufnr, start, end_)
+	for i = start, end_ do
+		local separator_index = t.find_char_index_form_bufline(bufnr, i, "|")
+		--t.del_hl(bufnr, i, i)
+		for _, n_i in pairs(separator_index or {}) do
+			local pos = { line = i, col = n_i - 1 }
+			t.set_extmark(bufnr, "Normal", pos, symbols.line)
+		end
 	end
+	-- 渲染对其符号
+	align_line = start + 1
+	function style_align(align_NE, symbol, anchor)
+		for _, n_i in pairs(align_NE or {}) do
+			local pos = { line = align_line, col = n_i + anchor }
+			t.set_extmark(bufnr, "Normal", pos, symbol)
+		end
+	end
+	--- 左对齐
+	local align_left = t.find_char_index_form_bufline(bufnr, align_line, ":-")
+	style_align(align_left, symbols.leftalign, -1)
+	-- 右对齐
+	local align_right = t.find_char_index_form_bufline(bufnr, align_line, "-:")
+	style_align(align_right, symbols.rightalign, 0)
 end
 
 function M.format_change_table(bufnr)
@@ -86,12 +105,18 @@ end
 -- [ 格式化当前buffer的表格 ]
 function M.format_table(bufnr)
 	local maxlen = M.table.maxlen
+	local heading_one_space_index = 0
+	local start_line = 0
+	local end_line = 0
 
 	-- [ heading ]
-	local heading_one_space_index = 0
 	for index, n in ipairs(M.table.heading) do
 		local s_row = n.node:start()
+		if index == 1 then
+			start_line = s_row
+		end
 		local separator_index = t.find_char_index_form_bufline(bufnr, s_row, "|")
+		assert(separator_index, "no find_char_index_form_bufline")
 		local align = M.table.align[index]
 		if index == 1 then
 			heading_one_space_index = separator_index[index] - 1
@@ -138,6 +163,9 @@ function M.format_table(bufnr)
 	-- [row]
 	for index, n in ipairs(M.table.row) do
 		local s_row = n.node:start()
+		if index == #M.table.row then
+			end_line = s_row
+		end
 		local separator_index = t.find_char_index_form_bufline(bufnr, s_row, "|")
 		i = index % #M.table.align
 		if i == 0 then
@@ -167,6 +195,9 @@ function M.format_table(bufnr)
 			}
 		)
 	end
+
+	-- restart style
+	M.style_table(bufnr, start_line, end_line)
 end
 
 function M.format_table_row(str, left, right, maxlen)

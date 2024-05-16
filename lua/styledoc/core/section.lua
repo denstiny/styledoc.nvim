@@ -13,6 +13,7 @@ function M.scavenger(bufnr, node)
 		local res, n = utils.is_line_covered_by_node(bufnr, i, node)
 		if not res then
 			utils.del_hl(bufnr, i, i + 1)
+			vim.notify(string.format("清道夫: line %d end_ %d", i, i + 1))
 		end
 	end
 end
