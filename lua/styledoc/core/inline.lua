@@ -12,7 +12,9 @@ end
 
 function M.scavenger(bufnr, node)
 	utils.del_hl(bufnr, node:start(), node:end_())
-	vim.notify(string.format("清道夫: line %d end_ %d", i, i + 1))
+	--vim.notify(
+	--	string.format("清道夫: line %d end_ %d", node:start(), node:end_())
+	--)
 end
 
 return M

@@ -134,7 +134,7 @@ function M.del_hl(bufnr, start, end_)
 		bufnr,
 		ns_id,
 		{ start, 0 },
-		{ end_, -1 },
+		{ end_, 0 },
 		{}
 	)
 	for _, mark in ipairs(items) do
