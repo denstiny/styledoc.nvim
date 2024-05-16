@@ -7,6 +7,9 @@ local utils = require("styledoc.utils")
 ---@param changes table
 ---@param refresh boolean | nil
 function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
+	if require("styledoc.info"):filtration_plugin_change() then
+		return
+	end
 	-- 如果changes为空的时候，说明用户只触发的修改节点内的数据，但是并没有增加或者删除节点
 	-- 在这种情况下，重绘光标所在的节点
 	if #changes == 0 then
@@ -30,8 +33,9 @@ function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
 			local end_ = change[4]
 			local query_texts = require("styledoc.query.info")
 			for key, query_text in pairs(query_texts) do
+				--vim.notify(string.format("查询 %s: %d %d", key, start, end_))
 				local query_nodes =
-					query.get_nodes_table(bufnr, start, end_, query_text)
+					query.get_nodes_table(bufnr, start, end_ + 1, query_text)
 				if query_nodes:count() > 0 then
 					local modu = require("styledoc.core." .. key)
 					query_nodes:for_each(modu.draw)

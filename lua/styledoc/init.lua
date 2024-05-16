@@ -17,7 +17,7 @@ function init(config)
 			vim.api.nvim_create_autocmd("WinResized", {
 				callback = function(_arg)
 					if _arg.buf == bufnr then
-						--event:emit_signal("StyleRefreshPre")
+						event:emit_signal("StyleRefreshPre", arg)
 					end
 				end,
 			})
@@ -50,9 +50,10 @@ function init(config)
 	for key, value in pairs(ui) do
 		if value.enable then
 			local modul = require("styledoc.core." .. key)
-			modul.init_signal()
+			--modul.init_signal()
 			event:bind_signal("StyleRefreshPre", function(arg)
-				modul.init(arg.buf)
+				local data = unpack(arg.data)
+				modul.init(data.buf)
 			end)
 		end
 	end
@@ -62,6 +63,14 @@ function M.setup(opts)
 	config:merge_config(opts)
 	config:init_color()
 	init(config:config())
+end
+
+function M.format_table(bufnr)
+	require("styledoc.core.table").format_table_all(bufnr)
+end
+
+function M.format_change_table(bufnr)
+	require("styledoc.core.table").format_change_table(bufnr)
 end
 
 return M

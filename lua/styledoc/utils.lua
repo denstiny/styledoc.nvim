@@ -1,9 +1,9 @@
 local M = {}
 local ts_utils = vim.treesitter
-local info = require("styledoc.info")
 local api = vim.api
 local fn = vim.fn
 local ns_id = vim.api.nvim_create_namespace("code-block")
+local info = require("styledoc.info")
 
 --- 设置全局高亮组
 ---@param group string
@@ -186,4 +186,74 @@ function M.is_line_covered_by_node(bufnr, target_line, node)
 
 	return false
 end
+
+--- 清理字符串开头和结尾的空格
+---@param s
+---@return
+function M.trim(s)
+	local text = s:gsub("^%s*(.-)%s*$", "%1")
+	return text, vim.fn.len(text)
+end
+
+-- 查找第 {n} 行中 {char} 的位置,返回一个列表 {index}
+---@param bufnr integer
+---@param line integer
+---@param char string
+function M.find_char_index_form_bufline(bufnr, line, char)
+	local _, find_str =
+		pcall(vim.api.nvim_buf_get_lines, bufnr, line, line + 1, true)
+	if not _ then
+		return
+	end
+	find_str = find_str[1]
+	local positions = {} -- 用来储存所有位置的表
+	local start = 1
+	while true do
+		local found_at = string.find(find_str, char, start, true)
+		if found_at then
+			table.insert(positions, found_at)
+			start = found_at + 1
+		else
+			break
+		end
+	end
+	return positions
+end
+
+--- 替换
+---@param bufnr integer
+---@param start_row integer
+---@param start_col integer
+---@param end_row integer
+---@param end_col integer
+---@param replacement [string]
+function M.replaceTextAndKeepCursor(
+	bufnr,
+	start_row,
+	start_col,
+	end_row,
+	end_col,
+	replacement
+)
+	--local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	--vim.api.nvim_win_set_cursor(0, cursor_pos)
+	--vim.notify(
+	--	string.format(
+	--		"cursor: %s\nrepla: %s",
+	--		vim.inspect(cursor_pos),
+	--		vim.inspect({ start_col, end_col })
+	--	)
+	--)
+	info:coment_change()
+	pcall(
+		vim.api.nvim_buf_set_text,
+		bufnr,
+		start_row,
+		start_col,
+		end_row,
+		end_col,
+		replacement
+	)
+end
+
 return M

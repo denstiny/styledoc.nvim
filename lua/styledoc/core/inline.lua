@@ -4,7 +4,9 @@ local utils = require("styledoc.utils")
 -- scavenger
 function M.draw(bufnr, captures)
 	for capture_name, node in pairs(captures) do
-		M.scavenger(bufnr, node)
+		if capture_name == "scavenger_inline" then
+			M.scavenger(bufnr, node)
+		end
 	end
 end
 
