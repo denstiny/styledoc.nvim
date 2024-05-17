@@ -57,7 +57,7 @@ function init(config)
 	end
 	event:bind_signal("StyleRefreshPre", function(arg)
 		local data = unpack(arg.data)
-		--utils.clear_all_extmark(data.buf)
+		utils.clear_all_extmark(data.buf)
 		for _, modul in ipairs(moduls) do
 			modul.init(data.buf)
 		end

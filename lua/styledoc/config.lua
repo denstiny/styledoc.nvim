@@ -9,9 +9,13 @@ local bg = vim.api.nvim_get_hl_by_name("Normal", true)["background"]
 local default_config = {
 	exclude = {},
 	ui = {
-		partingline = {
-			enable = false,
+		breakline = {
+			enable = true,
 			symbol = "─",
+		},
+		block = {
+			enable = true,
+			symbol = "█",
 		},
 		codeblock = {
 			enable = true,
@@ -21,31 +25,23 @@ local default_config = {
 			},
 		},
 		list = {
-			enable = false,
-			symbol = "",
-			hl_group = "md_list",
-		},
-		todolist = {
-			enable = false,
-			Undone = {
-				match = "[=]",
-				symbol = "□",
-			},
-			Done = {
-				match = "[x]",
-				symbol = "",
+			enable = true,
+			symbol = {
+				list_minus = "",
+				task_undo = " 󰄱 ",
+				task_do = "  ",
 			},
 		},
 		title = {
-			enable = false,
+			enable = true,
 			symbol = {
-				"○",
-				" ○ ",
-				"  ○ ",
-				"   ○ ",
-				"    ○ ",
-				"     ○ ",
-				"      ○ ",
+				h1 = "○",
+				h2 = " ○ ",
+				h3 = "  ○ ",
+				h4 = "   ○ ",
+				h5 = "    ○ ",
+				h6 = "     ○ ",
+				h7 = "      ○ ",
 			},
 		},
 		table = {
@@ -66,11 +62,12 @@ M.highlights = {
 	h4 = "style_h4",
 	h5 = "style_h5",
 	h6 = "style_h6",
-	todolist_done = "style_todolist_done",
-	todolist_undone = "style_todolist_udone",
-	list = "style_list",
+	task_do = "style_todolist_done",
+	task_undo = "style_todolist_udone",
+	list_minus = "style_list",
 	codeblock = "style_codeblock",
-	partingline = "style_partingline",
+	breakline = "style_partingline",
+	block = "style_block",
 }
 
 --- 返回插件配置
@@ -97,14 +94,18 @@ function M:init_color()
 	utils.hilink(self.highlights.h5, "markdownH5")
 	utils.hilink(self.highlights.h6, "markdownH6")
 	-- toodlist
-	utils.hi(self.highlights.todolist_done, "#d4fad4", "none")
-	utils.hi(self.highlights.todolist_udone, "#1a1918", "none")
+	--utils.hi(self.highlights.task_do, "#d4fad4", "none")
+	--utils.hi(self.highlights.todolist_udone, "#1a1918", "none")
+	utils.hilink(self.highlights.task_do, "TodoSignTODO")
+	utils.hilink(self.highlights.task_undo, "TodoSignPERF")
 	-- list
-	utils.hilink(self.highlights.list, "markdownListMarker")
+	utils.hilink(self.highlights.list_minus, "markdownListMarker")
 	-- partingline
-	utils.hilink(self.highlights.partingline, "Comment")
+	utils.hilink(self.highlights.breakline, "Comment")
 	-- codeblocks
 	utils.hilink(self.highlights.codeblock, "CursorLine")
+	-- block
+	utils.hilink(self.highlights.block, "CursorLineNr")
 end
 
 --- 获取符号，如果是函数则执行函数返回符号

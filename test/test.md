@@ -15,7 +15,6 @@
 | :------------- | :------------: | -------------: |
 | Item1          |     Item1      |          Item1 |
 
-
 > codeblock
 
 ```cpp
@@ -31,7 +30,7 @@ int main (int argc, char** argv) {
 
 > iamge
 
-![image](~/Downloads/telegram.png) 
+[image](~/Downloads/telegram.png) 
 
 > list
 
@@ -41,37 +40,6 @@ int main (int argc, char** argv) {
 1. asdf
   2. asdf
 
-
-$$
-\sqrt[{3}]{
-  -\frac{q}{2}
-  +\sqrt{\frac{q^2}{4} + {\frac{p^{3}}{27}}}
-}+
-\sqrt[{3}]{
-  -\frac{q}{2}
-  -\sqrt{\frac{q^2}{4} + {\frac{p^{3}}{27}}}
-}
-$$
-
-
-
-@startuml
-Bob -> Alice : hello
-@enduml
-
-
-$\sqrt{3x-1}+(1+x)^2$
-
-$$\begin{array}{c}
-
-\nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} &
-= \frac{4\pi}{c}\vec{\mathbf{j}}    \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\
-
-\nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\
-
-\nabla \cdot \vec{\mathbf{B}} & = 0
-
-\end{array}$$
 
 ``` mermaid
 gantt
@@ -130,3 +98,5 @@ digraph G {
   end [shape=Msquare];
 }
 ```
+
+> coear
