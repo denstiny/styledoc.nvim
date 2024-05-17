@@ -12,7 +12,7 @@ function M.draw(bufnr, captures)
 	M.table = { heading = {}, cell = {}, row = {}, maxlen = 0, align = {} }
 	for capture, node in pairs(captures) do
 		local start, end_ = node:start(), node:end_()
-		M.style_table(bufnr, start - 1, end_)
+		M.style_table(bufnr, start, end_ - 1)
 	end
 end
 

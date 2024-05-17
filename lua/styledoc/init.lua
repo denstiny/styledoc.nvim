@@ -47,16 +47,21 @@ function init(config)
 
 	-- 在初始化阶段，发送刷新指令
 	local ui = config["ui"]
+	local moduls = {}
 	for key, value in pairs(ui) do
 		if value.enable then
 			local modul = require("styledoc.core." .. key)
 			--modul.init_signal()
-			event:bind_signal("StyleRefreshPre", function(arg)
-				local data = unpack(arg.data)
-				modul.init(data.buf)
-			end)
+			table.insert(moduls, modul)
 		end
 	end
+	event:bind_signal("StyleRefreshPre", function(arg)
+		local data = unpack(arg.data)
+		--utils.clear_all_extmark(data.buf)
+		for _, modul in ipairs(moduls) do
+			modul.init(data.buf)
+		end
+	end)
 end
 
 function M.setup(opts)

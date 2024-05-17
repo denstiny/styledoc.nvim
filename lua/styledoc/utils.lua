@@ -40,7 +40,7 @@ end
 ---@param hl string|integer
 function M.hi_line(bufnr, line, hl)
 	local marks = M.get_extmark(bufnr, line, line + 1)
-	local fn_len = vim.fn.strdisplaywidth(fn.getline(line + 1))
+	local fn_len = fn.strdisplaywidth(M.get_buf_line(bufnr, line))
 	local text = string.rep(" ", fn.winwidth(fn.bufwinnr(bufnr)) - fn_len)
 	local opts = {
 		virt_text = { { text, hl } },
@@ -48,15 +48,8 @@ function M.hi_line(bufnr, line, hl)
 		virt_text_pos = "overlay",
 	}
 	local extmark_id = api.nvim_buf_add_highlight(bufnr, ns_id, hl, line, 0, -1)
-	local _, res = pcall(
-		api.nvim_buf_set_extmark,
-		bufnr,
-		ns_id,
-		line,
-		--fn.len(fn.getline(line + 1)),
-		fn_len,
-		opts
-	)
+	local _, res =
+		pcall(api.nvim_buf_set_extmark, bufnr, ns_id, line, fn_len, opts)
 	if not _ then
 		print(res)
 		return nil, nil
@@ -134,7 +127,7 @@ function M.del_hl(bufnr, start, end_)
 		bufnr,
 		ns_id,
 		{ start, 0 },
-		{ end_, 0 },
+		{ end_, -1 },
 		{}
 	)
 	for _, mark in ipairs(items) do
@@ -256,4 +249,14 @@ function M.replaceTextAndKeepCursor(
 	)
 end
 
+function M.clear_all_extmark(bufnr)
+	vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
+end
+
+function M.get_buf_line(bufnr, line)
+	return table.concat(
+		vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false),
+		"n"
+	)
+end
 return M
