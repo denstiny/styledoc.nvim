@@ -23,4 +23,5 @@ function M.scavenger(bufnr, node)
 	--vim.notify(string.format("清道夫: line %d end_ %d", start, end_))
 end
 
+function M.init(bufnr, captures) end
 return M
