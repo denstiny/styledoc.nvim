@@ -52,6 +52,12 @@ local default_config = {
 				line = "│",
 			},
 		},
+		section = {
+			enable = true,
+		},
+		inline = {
+			enable = true,
+		},
 	},
 }
 
