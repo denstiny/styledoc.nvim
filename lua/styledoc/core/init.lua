@@ -34,7 +34,9 @@ function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
 			local end_ = change[4]
 			local query_texts = require("styledoc.query.info")
 			for key, query_text in pairs(query_texts) do
-				if not config:config()["ui"][key].enable then
+				if
+					config:config()["ui"][key] and not config:config()["ui"][key].enable
+				then
 					return
 				end
 				--vim.notify(string.format("查询 %s: %d %d", key, start, end_))
