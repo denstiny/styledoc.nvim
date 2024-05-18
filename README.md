@@ -38,13 +38,6 @@ styledoc.nvim is an exquisite Markdown editing and preview plugin tailored for N
    
 3. After installation, you might need to run :TSUpdate to ensure Treesitter is up to date with the latest grammar files.
 
----
-
-### Quick Start:
-
-1. Open your Markdown file.
-2. Invoke the :NeoMarkPreview command to start real-time preview.
-3. Begin editing and watch your changes come to life instantly.
 
 ---
 ### Advanced Configuration:
