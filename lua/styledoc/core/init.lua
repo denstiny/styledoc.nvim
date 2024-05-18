@@ -2,6 +2,7 @@ local M = {}
 local query = require("styledoc.query.utils")
 local ts_utils = require("nvim-treesitter.ts_utils")
 local utils = require("styledoc.utils")
+local config = require("styledoc.config")
 
 ---@param bufnr integer
 ---@param changes table
@@ -33,6 +34,9 @@ function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
 			local end_ = change[4]
 			local query_texts = require("styledoc.query.info")
 			for key, query_text in pairs(query_texts) do
+				if not config:config()["ui"][key].enable then
+					return
+				end
 				--vim.notify(string.format("查询 %s: %d %d", key, start, end_))
 				local query_nodes =
 					query.get_nodes_table(bufnr, start, end_ + 1, query_text)
