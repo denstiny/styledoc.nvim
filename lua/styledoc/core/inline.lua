@@ -17,4 +17,5 @@ function M.scavenger(bufnr, node)
 	--)
 end
 
+function M.init(bufnr, captures) end
 return M
