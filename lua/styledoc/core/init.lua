@@ -8,6 +8,7 @@ local config = require("styledoc.config")
 ---@param changes table
 ---@param refresh boolean | nil
 function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
+	local user_config = config:config()
 	if require("styledoc.info"):filtration_plugin_change() then
 		return
 	end
@@ -33,18 +34,15 @@ function M.assignTasksBasedOnNodeChange(bufnr, changes, refresh)
 			local start = change[1]
 			local end_ = change[4]
 			local query_texts = require("styledoc.query.info")
+			--vim.notify(vim.inspect(query_texts))
 			for key, query_text in pairs(query_texts) do
-				if
-					config:config()["ui"][key] and not config:config()["ui"][key].enable
-				then
-					return
-				end
-				--vim.notify(string.format("查询 %s: %d %d", key, start, end_))
-				local query_nodes =
-					query.get_nodes_table(bufnr, start, end_ + 1, query_text)
-				if query_nodes:count() > 0 then
-					local modu = require("styledoc.core." .. key)
-					query_nodes:for_each(modu.draw)
+				if user_config["ui"][key].enable == true then
+					local query_nodes =
+						query.get_nodes_table(bufnr, start, end_ + 1, query_text)
+					if query_nodes:count() > 0 then
+						local modu = require("styledoc.core." .. key)
+						query_nodes:for_each(modu.draw)
+					end
 				end
 			end
 		end
