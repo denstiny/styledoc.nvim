@@ -1,0 +1,106 @@
+```
+*styledoc.txt*    Documentation for styledoc
+
+CONTENTS                               *styledoc-contents*
+
+1. Introduction ............ |styledoc-introduction|
+2. Default Configuration ... |styledoc-default-configuration|
+3. Configuration Guide ..... |styledoc-configuration-guide|
+4. API ..................... |styledoc-api|
+5. Commands ................ |styledoc-commands|
+
+==============================================================================
+1. Introduction                                             *styledoc-introduction*
+
+styledoc enhances Neovim by providing custom visual decorators for different
+UI elements like breakline, block, codeblock, and more. The plugin comes with
+a set of default configurations that can be easily customized.
+
+==============================================================================
+2. Default Configuration                             *styledoc-default-configuration*
+
+Below is the default configuration for styledoc:
+
+>{
+>  ui = {
+>    breakline = {
+>      enable = false,
+>      symbol = "─",
+>    },
+>    block = {
+>      enable = false,
+>      symbol = "█",
+>    },
+>    codeblock = {
+>      enable = true,
+>      symbol = {
+>        start = ">",
+>        end_ = "<",
+>      },
+>    },
+>    list = {
+>      enable = true,
+>      symbol = {
+>        list_minus = "",
+>        task_undo = "",
+>        task_do = "",
+>      },
+>    },
+>    title = {
+>      enable = true,
+>      symbol = {
+>        h1 = "○",
+>        h2 = "○",
+>        h3 = "○",
+>        h4 = "○",
+>        h5 = "○",
+>        h6 = "○",
+>        h7 = "○",
+>      },
+>    },
+>    table = {
+>      enable = true,
+>      symbol = {
+>        leftalign = "",
+>        rightalign = "",
+>        line = "│",
+>      },
+>    },
+>  },
+>}
+
+Symbols can be a string or a function that takes `bufnr` as a parameter and
+returns a string. The symbol functions allow dynamic symbols based on buffer
+state or other conditions.
+
+==============================================================================
+3. Configuration Guide                                      *styledoc-configuration-guide*
+
+To configure styledoc, you should set the configuration before loading the
+plugin, usually in your `init.vim` or `init.lua`:
+
+For example, to enable breakline and set a custom symbol:
+
+ lua require('styledoc').setup({
+ >   ui = {
+ >     breakline = {
+ >       enable = true,
+ >       symbol = "━",
+ >     },
+ >   },
+ > })
+4. API                                                             *styledoc-api*
+
+styledoc provides the following functions to interact with Neovim:
+
+- `format_change_table()` - Format the recently modified table. Does not take
+  any parameters. Make sure to call this function in the context where the
+  modification has just occurred.
+
+      :lua require('styledoc').format_change_table(0)
+
+- `format_table()` - Format all tables in the current buffer. Again, takes no
+  parameters and should be invoked when needed.
+
+      :lua require('styledoc').format_table(0)
+
